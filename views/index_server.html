@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width , user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="description" content="complete attributes of css3">
+    <!-- Add to homescreen for Safari on Ios -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#2396F0">
+    <meta name="apple-mobile-web-app-title" content="Title">
+    <link rel="apple-touch-icon" href="#">
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Title">
+    <meta name="theme-color" content="#2396F0">
+    <link rel="icon" sizes="50x50" href="#">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/index.css">
+</head>
+<body>
+<input type="hidden" id="id" value="<%= id %>">
+<header>
+    <ul>
+        <% for (let i = 0; i < result.length; i++) { %>
+        <li><a href="/?id=<%= result[i].id %>" class="<%= result[i].id == id? 'active':'' %>"><%= result[i].title %></a>
+        </li>
+        <% } %>
+    </ul>
+</header>
+<main>
+    <ul id="news">
+        <% for(let i = 0 ; i < news.length ; i++ ){ %>
+        <li><img src="<%= news[i].thumbnail %>" width="30" height="30" alt=""><a href="<%= news[i].url %>"
+                                                                                 target="_blank"><%= news[i].title %></a>
+        </li>
+        <% } %>
+    </ul>
+    <a href="javascript:void(0)" id="load-more">加载更多</a>
+</main>
+</body>
+<script>
+    var page = 1;
+    var load = document.getElementById('load-more');
+    var news = document.getElementById('news');
+    var id = document.getElementById('id');
+
+    load.addEventListener('click', () => {
+        page += 1;
+        fetch(`/load?page=${page}&id=${id.value}`)
+            .then(res => res.json())
+            .then(res => {
+                if (res.state === 200) {
+                    res.data.forEach((v) => {
+                        var li = document.createElement('li');
+                        var a = document.createElement('a');
+                        var img = document.createElement('img');
+                        a.setAttribute('href', v.url);
+                        img.setAttribute('src', v.thumbnail);
+                        img.setAttribute('width', '30');
+                        img.setAttribute('height', '30');
+                        a.innerHTML = v.title;
+                        li.appendChild(img);
+                        li.appendChild(a);
+                        news.appendChild(li);
+                    })
+                }else if(res.state === 400){
+                    if(confirm('没有数据,点击确认返回顶部!')){
+                        console.log(document.body.scrollTop)
+                    }
+                }
+            })
+
+    })
+
+</script>
+</html>
